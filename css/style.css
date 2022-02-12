@@ -181,6 +181,38 @@ header {
     color: var(--clr-accent);
 }
 
+.nav-toggle {
+    padding: .5em;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    position: absolute;
+    right: 1em;
+    top: 1em;
+    z-index: 1000;
+}
+
+.nav-open .nav {
+    transform: translate(0);
+}
+
+.nav-open .nav-toggle {
+    position: fixed;
+}
+
+.nav-open .hamburger {
+    transition: transform 500ms;
+    transform: rotate(.625turn);
+}
+
+.nav-open .hamburger::before {
+    transform: rotate(90deg) translate(-6px);
+}
+
+.nav-open .hamburger::after {
+    opacity: 0;
+}
+
 .hamburger {
     display: block;
     position: relative;
@@ -189,7 +221,7 @@ header {
 .hamburger,
 .hamburger::before,
 .hamburger::after {
-    background: var(--clr-dark);
+    background: var(--clr-accent);
     width: 2em;
     height: 3px;
     border-radius: 1em;
@@ -201,8 +233,10 @@ header {
     position: absolute;
     left: 0;
     right: 0;
-    background: var(--clr-dark);
 }
+
+.hamburger::before { top: 6px;}
+.hamburger::after { bottom: 6px;}
 
 /* Intro Section */
 
