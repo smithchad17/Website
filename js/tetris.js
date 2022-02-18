@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ]
     
     const zTetromino = [
-        [width+1, width+1, width+2, width*2+1],
+        [width*2, width+1, width+2, width*2+1],
         [0, width, width+1, width*2],
         [width*3, width*3+1, width*2, width*2+1],
         [0, width, width+1, width*2]
@@ -61,6 +61,46 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     }
 
-    
+    timerId = setInterval(moveDown, 500);
 
+    //assign functions to keyCodes
+    function control(e) {
+        if(e.keyCode === 37) {
+            moveLeft()
+        }
+    }
+
+    document.addEventListener('keyup', control)
+
+    //move down function
+    function moveDown () {
+        undraw();
+        currentPosition += width;
+        draw();
+        freeze()
+    }
+
+    function freeze() {
+        if(current.some(index => squares[currentPosition + index + width].classList.contains('taken'))){
+            current.forEach(index => squares[currentPosition + index].classList.add('taken'))
+            //start a new tetromino ralling
+            random = Math.floor(Math.random() * theTetrominoes.length)
+            current = theTetrominoes[random][currentRotation]
+            currentPosition = 4
+            draw()
+        }
+    }
+
+    function moveLeft() {
+        undraw()
+        const isAtLeftEdge = current.some(index => (currentPosition + index) % width === 0)
+
+        if(!isAtLeftEdge) currentPosition -= 1
+
+        if(current.some(index => squares[currentPosition + index].classList.contains('taken'))){
+            currentPosition += 1
+        }
+
+        draw()
+    }
 })
