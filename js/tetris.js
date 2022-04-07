@@ -16,22 +16,22 @@ document.addEventListener('DOMContentLoaded', () => {
     ]
 
     const lTetromino = [
-        [1, width+1, width*2+1, 2],
-        [width, width+1, width+2, width*2+2],
-        [1, width+1, width*2+1, width*2],
-        [width, width*2, width*2+1, width*2+2]
+        [0, width, width*2, width*2+1],
+        [0, width, 1, 2],
+        [0, 1, width+1, width*2+1],
+        [2, width+2, width+1, width]
     ]
     
     const zTetromino = [
-        [width*2, width+1, width+2, width*2+1],
-        [0, width, width+1, width*2],
-        [width*3, width*3+1, width*2, width*2+1],
-        [0, width, width+1, width*2]
+        [1, 2, width, width+1],
+        [0, width, width+1, width*2+1],
+        [1, 2, width, width+1],
+        [0, width, width+1, width*2+1]
     ]
 
     const tTetromino = [
-        [2, width, width+1, width+2],
-        [2, width+1, width+2, width*2],
+        [width, width+1, width+2, 1],
+        [1, width+1, width*2+1, width+2],
         [width, width+1, width+2, width*2+1],
         [1, width, width+1, width*2+1]
     ]
@@ -73,22 +73,25 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     }
 
-    //timerId = setInterval(moveDown, 1000);
-
     //assign functions to keyCodes
-    function control(e) {
-        if(e.keyCode === 37) {
-            moveLeft()
-        } else if (e.keyCode === 38){
-            rotate()
-        } else if (e.keyCode === 39){
-            moveRight()
-        } else if (e.keyCode === 40){
-            moveDown()
+    document.addEventListener('keydown', function(e){
+        switch (e.key) {
+            case "ArrowLeft":
+                moveLeft();
+                break;
+            case "ArrowUp":
+                e.preventDefault();
+                rotate();
+                break;
+            case "ArrowRight":
+                moveRight();
+                break;
+            case "ArrowDown":
+                e.preventDefault();
+                moveDown();
+                break;
         }
-    }
-
-    document.addEventListener('keyup', control)
+    })
 
     //move down function
     function moveDown () {
@@ -139,6 +142,33 @@ document.addEventListener('DOMContentLoaded', () => {
         draw()
     }
 
+    ///FIX ROTATION OF TETROMINOS A THE EDGE 
+  function isAtRight() {
+    return current.some(index=> (currentPosition + index + 1) % width === 0)  
+  }
+  
+  function isAtLeft() {
+    return current.some(index=> (currentPosition + index) % width === 0)
+  }
+
+    function checkRotatedPosition(P){
+        P = P || currentPosition       //get current position.  Then, check if the piece is near the left side.
+        if ((P+1) % width < 4) {         //add 1 because the position index can be 1 less than where the piece is (with how they are indexed).     
+          if (isAtRight()){            //use actual position to check if it's flipped over to right side
+            currentPosition += 1    //if so, add one to wrap it back around
+            checkRotatedPosition(P) //check again.  Pass position from start, since long block might need to move more.
+            }
+        }
+        else if (P % width > 5) {
+          if (isAtLeft()){
+            currentPosition -= 1
+          checkRotatedPosition(P)
+          }
+        }
+      }
+
+
+
     //rotate the tetromino
     function rotate(){
         undraw()
@@ -148,6 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentRotation = 0
         }
         current = theTetrominoes[random][currentRotation]
+        checkRotatedPosition()
         draw()
     }
 
@@ -159,9 +190,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //the tetrominos without rotations
     const upNextTetrominoes = [
-        [1, displayWidth+1, displayWidth*2+1, 2],
-        [displayWidth*2, displayWidth+1, displayWidth+2, displayWidth*2+1],
-        [2, displayWidth, displayWidth+1, displayWidth+2],
+        [0, displayWidth, displayWidth*2, displayWidth*2+1],
+        [1, 2, displayWidth, displayWidth+1],
+        [displayWidth, displayWidth+1, displayWidth+2, 1],
         [0, 1, displayWidth, displayWidth+1],
         [1, displayWidth+1, displayWidth*2+1, displayWidth*3+1],
     ]
@@ -213,12 +244,12 @@ document.addEventListener('DOMContentLoaded', () => {
     //game over
     function gameOver() {
         if(current.some(index => squares[currentPosition + index].classList.contains('taken'))){
-            scoreDisplay.innerHTML = 'end'
+            scoreDisplay.innerHTML = 'Game Over'
             clearInterval(timerId)
         }
     }
 
-
+    
 
 
 })
