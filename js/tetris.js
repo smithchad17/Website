@@ -1,3 +1,8 @@
+//TODO Increase speed at certain scores
+//TODO Add area with current score and high score
+//TODO When click 'Restart' clear board, 
+
+
 document.addEventListener('DOMContentLoaded', () => {
     const width = 10
     let nextRandom = 0
@@ -7,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const startBtn = document.querySelector('#start-button')
     let timerId
     let score = 0
+    let isGameOver = false
     const colors = [
         'orange',
         'red',
@@ -75,21 +81,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //assign functions to keyCodes
     document.addEventListener('keydown', function(e){
-        switch (e.key) {
-            case "ArrowLeft":
-                moveLeft();
-                break;
-            case "ArrowUp":
-                e.preventDefault();
-                rotate();
-                break;
-            case "ArrowRight":
-                moveRight();
-                break;
-            case "ArrowDown":
-                e.preventDefault();
-                moveDown();
-                break;
+        if(!isGameOver){ //ignore controls if game is over
+            switch (e.key) {
+                case "ArrowLeft":
+                    moveLeft();
+                    break;
+                case "ArrowUp":
+                    e.preventDefault();
+                    rotate();
+                    break;
+                case "ArrowRight":
+                    moveRight();
+                    break;
+                case "ArrowDown":
+                    e.preventDefault();
+                    moveDown();
+                    break;
+            }
         }
     })
 
@@ -104,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function freeze() {
         if(current.some(index => squares[currentPosition + index + width].classList.contains('taken'))){
             current.forEach(index => squares[currentPosition + index].classList.add('taken'))
-            //start a new tetromino ralling
+            //start a new tetromino falling
             random = nextRandom
             nextRandom = Math.floor(Math.random() * theTetrominoes.length)
             current = theTetrominoes[random][currentRotation]
@@ -142,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
         draw()
     }
 
-    ///FIX ROTATION OF TETROMINOS A THE EDGE 
+///FIX ROTATION OF TETROMINOS A THE EDGE 
   function isAtRight() {
     return current.some(index=> (currentPosition + index + 1) % width === 0)  
   }
@@ -219,6 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
             nextRandom = Math.floor(Math.random()*theTetrominoes.length);
             displayShape()
         }
+        isGameOver = false
     })
 
     //add score
@@ -245,7 +254,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function gameOver() {
         if(current.some(index => squares[currentPosition + index].classList.contains('taken'))){
             scoreDisplay.innerHTML = 'Game Over'
+            startBtn.innerHTML = 'Restart'
             clearInterval(timerId)
+            isGameOver = true
         }
     }
 
