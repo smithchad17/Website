@@ -1,7 +1,5 @@
 //TODO Increase speed at certain scores
 //TODO Add area with current score and high score
-//TODO When click 'Restart' clear board, 
-
 
 document.addEventListener('DOMContentLoaded', () => {
     const width = 10
@@ -13,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let timerId
     let score = 0
     let isGameOver = false
+    let speed = 1000
     const colors = [
         'orange',
         'red',
@@ -76,6 +75,19 @@ document.addEventListener('DOMContentLoaded', () => {
         current.forEach(index => {
             squares[currentPosition + index].classList.remove('tetromino')
             squares[currentPosition + index].style.backgroundColor = ''
+        })
+    }
+
+    //When user clicks 'Restart'
+    function clearBoard() {
+        squares.forEach(index => {
+            if(index.classList.contains('tetromino taken')){
+                index.classList.remove('tetromino taken')
+            }
+            if(index.classList.contains('tetromino')){
+                index.removeAttribute('class')
+            }
+            index.removeAttribute('style')
         })
     }
 
@@ -218,14 +230,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //add functionality to the button
     startBtn.addEventListener('click', () => {
-        if (timerId) {
-            clearInterval(timerId)
-            timerId = null
+        if (startBtn.innerHTML != 'Restart'){
+            if (timerId) {
+                clearInterval(timerId)
+                timerId = null
+            } else {
+                draw()
+                timerId = setInterval(moveDown, speed)
+                nextRandom = Math.floor(Math.random()*theTetrominoes.length);
+                displayShape()
+            }
         } else {
-            draw()
-            timerId = setInterval(moveDown, 1000)
+            startBtn.innerHTML = 'Start/Pause'
+            score = 0
+            scoreDisplay.innerHTML = score
+            clearBoard()
+            timerId = setInterval(moveDown, speed)
             nextRandom = Math.floor(Math.random()*theTetrominoes.length);
             displayShape()
+
         }
         isGameOver = false
     })
@@ -237,6 +260,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if(row.every(index => squares[index].classList.contains('taken'))){
                 score += 10
+                if (score % 50 == 0){
+                    increaseSpeed()
+                    timerId = setInterval(moveDown, speed)
+                }
                 scoreDisplay.innerHTML = score
                 row.forEach(index => {
                     squares[index].classList.remove('taken')
@@ -250,12 +277,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function increaseSpeed() {
+        speed -= 500
+    }
+
     //game over
     function gameOver() {
         if(current.some(index => squares[currentPosition + index].classList.contains('taken'))){
             scoreDisplay.innerHTML = 'Game Over'
             startBtn.innerHTML = 'Restart'
             clearInterval(timerId)
+            timerId = null
             isGameOver = true
         }
     }
